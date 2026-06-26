@@ -1,0 +1,105 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  pubDate: Date;
+  tags?: string[];
+}
+
+const { title, description, pubDate, tags = [] } = Astro.props;
+const dateStr = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="container post">
+    <a href="/blog" class="back-link">← back to blog</a>
+    <header class="post__header">
+      <h1>{title}</h1>
+      <div class="post__meta">
+        <time datetime={pubDate.toISOString()}>{dateStr}</time>
+        {tags.length > 0 && (
+          <span class="post__tags">
+            {tags.map((t) => (
+              <span class="tag">{t}</span>
+            ))}
+          </span>
+        )}
+      </div>
+    </header>
+    <div class="post__body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    max-width: 720px;
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-8);
+  }
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--oc-text-muted);
+  }
+  .back-link:hover {
+    color: var(--oc-primary);
+  }
+  .post__header {
+    margin-bottom: var(--space-6);
+  }
+  .post__header h1 {
+    margin: 0 0 var(--space-3);
+  }
+  .post__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--oc-text-muted);
+  }
+  .post__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .post__body {
+    line-height: 1.75;
+  }
+  .post__body :global(h2) {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+  }
+  .post__body :global(h3) {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
+  }
+  .post__body :global(ul),
+  .post__body :global(ol) {
+    padding-left: 1.25rem;
+  }
+  .post__body :global(li) {
+    margin-bottom: var(--space-2);
+  }
+  .post__body :global(blockquote) {
+    border-left: 3px solid var(--oc-accent);
+    margin: var(--space-5) 0;
+    padding: var(--space-2) var(--space-4);
+    color: var(--oc-text-muted);
+  }
+  .post__body :global(pre) {
+    margin: var(--space-5) 0;
+    border: 1px solid var(--oc-border-subtle);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+  }
+</style>

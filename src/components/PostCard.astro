@@ -1,0 +1,77 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+  tags?: string[];
+  readingTime?: string;
+}
+const { href, title, description, pubDate, tags = [], readingTime } = Astro.props;
+const dateStr = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<article class="card">
+  <a href={href} class="card__link">
+    <header>
+      <h3 class="card__title">{title}</h3>
+      <div class="card__meta">
+        <time datetime={pubDate.toISOString()}>{dateStr}</time>
+        {readingTime && <span class="card__rt">· {readingTime}</span>}
+      </div>
+    </header>
+    <p class="card__desc">{description}</p>
+    {tags.length > 0 && (
+      <div class="card__tags">
+        {tags.map((t) => (
+          <span class="tag">{t}</span>
+        ))}
+      </div>
+    )}
+  </a>
+</article>
+
+<style>
+  .card {
+    border: 1px solid var(--oc-border-subtle);
+    border-radius: var(--radius);
+    background: var(--oc-bg-panel);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .card:hover {
+    border-color: var(--oc-border-active);
+    transform: translateY(-2px);
+  }
+  .card__link {
+    display: block;
+    padding: var(--space-5);
+    color: inherit;
+  }
+  .card__title {
+    margin: 0 0 var(--space-2);
+    color: var(--oc-text);
+  }
+  .card:hover .card__title {
+    color: var(--oc-primary);
+  }
+  .card__meta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--oc-text-muted);
+    margin-bottom: var(--space-3);
+  }
+  .card__desc {
+    margin: 0 0 var(--space-3);
+    color: var(--oc-text-muted);
+    font-size: 0.95rem;
+  }
+  .card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

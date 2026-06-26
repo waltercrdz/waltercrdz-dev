@@ -1,0 +1,71 @@
+---
+---
+
+<button
+  id="theme-toggle"
+  class="theme-toggle"
+  type="button"
+  aria-label="Toggle color theme"
+  title="Toggle theme"
+>
+  <span class="theme-toggle__icon theme-toggle__sun">☀</span>
+  <span class="theme-toggle__icon theme-toggle__moon">☾</span>
+</button>
+
+<script is:inline>
+  (function () {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const sync = () => {
+      const t = document.documentElement.getAttribute('data-theme');
+      btn.setAttribute('aria-pressed', String(t === 'light'));
+    };
+    sync();
+    btn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem('theme', next);
+      } catch (_) {}
+      sync();
+    });
+  })();
+</script>
+
+<style>
+  .theme-toggle {
+    background: var(--oc-bg-element);
+    border: 1px solid var(--oc-border);
+    border-radius: var(--radius-sm);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .theme-toggle:hover {
+    border-color: var(--oc-border-active);
+  }
+  .theme-toggle__icon {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+  :global([data-theme='dark']) .theme-toggle__sun {
+    display: inline;
+    color: var(--oc-primary);
+  }
+  :global([data-theme='dark']) .theme-toggle__moon {
+    display: none;
+  }
+  :global([data-theme='light']) .theme-toggle__sun {
+    display: none;
+  }
+  :global([data-theme='light']) .theme-toggle__moon {
+    display: inline;
+    color: var(--oc-secondary);
+  }
+</style>

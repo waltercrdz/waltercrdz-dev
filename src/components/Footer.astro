@@ -1,0 +1,58 @@
+---
+import { profile } from '../data/profile';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <p class="footer__copy">
+      &copy; {year} {profile.name} — {profile.role}
+    </p>
+    <div class="footer__socials">
+      {profile.socials.map((s) => (
+        <a
+          href={s.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={s.label}
+        >
+          {s.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--oc-border-subtle);
+    padding: var(--space-5) 0;
+    margin-top: var(--space-7);
+  }
+  .footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .footer__copy {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--oc-text-muted);
+  }
+  .footer__socials {
+    display: flex;
+    gap: var(--space-4);
+  }
+  .footer__socials a {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--oc-text-muted);
+  }
+  .footer__socials a:hover {
+    color: var(--oc-primary);
+  }
+</style>

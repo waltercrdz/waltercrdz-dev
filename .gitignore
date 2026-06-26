@@ -1,0 +1,22 @@
+# build output
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# other package manager lockfiles (this project uses pnpm-lock.yaml only)
+package-lock.json
+yarn.lock
+
+# env
+.env
+.env.production
+
+# macos
+.DS_Store
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea/

@@ -1,0 +1,100 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { profile } from '../data/profile';
+
+const path = Astro.url.pathname;
+const isActive = (p: string) =>
+  p === '/' ? path === '/' : path.startsWith(p);
+---
+
+<header class="nav">
+  <div class="container nav__inner">
+    <a href="/" class="nav__logo" aria-label="Home">
+      <span class="nav__prompt">&gt;</span> {profile.name.split(' ')[0].toLowerCase()}.
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="/" class:list={['nav__link', { active: isActive('/') && path === '/' }]}>home</a>
+      <a href="/blog" class:list={['nav__link', { active: isActive('/blog') }]}>blog</a>
+      {profile.socials.map((s) => (
+        <a
+          href={s.url}
+          class="nav__link nav__icon"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={s.label}
+        >
+          {s.icon}
+        </a>
+      ))}
+      <ThemeToggle />
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--oc-bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--oc-border-subtle);
+  }
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav__logo {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--oc-text);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .nav__prompt {
+    color: var(--oc-primary);
+  }
+  .nav__logo:hover {
+    color: var(--oc-primary);
+  }
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .nav__link {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--oc-text-muted);
+  }
+  .nav__link:hover,
+  .nav__link.active {
+    color: var(--oc-primary);
+  }
+  .nav__icon {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    border: 1px solid var(--oc-border);
+    border-radius: var(--radius-sm);
+    padding: 0.2rem 0.45rem;
+  }
+  .nav__icon:hover {
+    border-color: var(--oc-border-active);
+  }
+
+  @media (max-width: 540px) {
+    .nav__links {
+      gap: var(--space-3);
+    }
+    .nav__link:not(.nav__icon) {
+      display: none;
+    }
+    .nav__link.active,
+    .nav__link[href='/blog'] {
+      display: inline;
+    }
+  }
+</style>

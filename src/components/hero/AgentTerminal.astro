@@ -1,0 +1,47 @@
+---
+import { heroTopics } from '../../data/profile';
+const topicsJson = JSON.stringify(heroTopics.map(({ id, label, heading, todo, body }) => ({ id, label, heading, todo, body })));
+---
+
+<section class="hero-wrap container">
+  <div class="hero-head">
+    <p class="hero-head__kicker">Software Engineer · Barcelona · 14+ yrs</p>
+    <h1 class="hero-head__title">
+      Coding &amp; Software Architecture <span class="muted">for the real world</span>
+    </h1>
+  </div>
+  <agent-terminal data-topics={topicsJson}></agent-terminal>
+  <noscript>
+    <p class="muted">The interactive terminal needs JavaScript. The rest of the site works without it.</p>
+  </noscript>
+</section>
+
+<script>
+  import './agent-terminal.ts';
+</script>
+
+<style>
+  .hero-wrap {
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-7);
+  }
+  .hero-head {
+    margin-bottom: var(--space-6);
+    max-width: 640px;
+  }
+  .hero-head__kicker {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--oc-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 var(--space-3);
+  }
+  .hero-head__title {
+    margin: 0;
+    line-height: 1.15;
+  }
+  .hero-head__title .muted {
+    color: var(--oc-text-muted);
+  }
+</style>

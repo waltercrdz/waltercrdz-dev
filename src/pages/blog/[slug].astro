@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const all = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const idx = all.findIndex((p) => p.id === post.id);
+const newer = idx > 0 ? all[idx - 1] : null;
+const older = idx < all.length - 1 ? all[idx + 1] : null;
+---
+
+<BlogLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  tags={post.data.tags}
+>
+  <Content />
+
+  <hr />
+  <nav class="post-nav">
+    {older && (
+      <a class="post-nav__link" href={`/blog/${older.id}/`}>← {older.data.title}</a>
+    )}
+    {newer && (
+      <a class="post-nav__link post-nav__link--right" href={`/blog/${newer.id}/`}>{newer.data.title} →</a>
+    )}
+  </nav>
+</BlogLayout>
+
+<style>
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  .post-nav__link { color: var(--oc-text-muted); }
+  .post-nav__link:hover { color: var(--oc-primary); }
+  .post-nav__link--right { margin-left: auto; text-align: right; }
+</style>
