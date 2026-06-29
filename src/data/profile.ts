@@ -39,18 +39,50 @@ export const profile = {
     {
       role: 'Senior Software Engineer',
       company: 'eDreams ODIGEO',
-      period: 'Current · Barcelona',
+      period: 'Mar 2025 – Current · Remote',
       summary:
-        'High-traffic backend for one of Europe\'s largest travel platforms. Architecture, performance, and shipping resilient services.',
-      tech: ['Java', 'Spring Boot', 'Kafka', 'Kubernetes'],
+        'Data Experience Team (via InnoIT). Oracle-to-PostgreSQL migration, backend architecture, and agentic AI workflows.',
+      tech: ['Java', 'PostgreSQL', 'Jenkins', 'JPA', 'Hibernate', 'Microservices'],
+    },
+    {
+      role: 'Senior Software Engineer',
+      company: 'Inditex',
+      period: 'Feb 2025 – Jan 2026 · Remote',
+      summary:
+        'Shopping Cart Team (via InnoIT). Core cart service for all Inditex brands; backend architecture, performance tuning, and CI.',
+      tech: ['Java', 'Spring Boot', 'Redis', 'Couchbase', 'Kubernetes', 'Grafana'],
+    },
+    {
+      role: 'Senior Software Engineer',
+      company: 'Connectist',
+      period: 'Aug 2023 – Sep 2024 · Remote',
+      summary:
+        'Profile Validation Team. Accuracy and reliability of decision-maker contact data for B2B marketing campaigns.',
+      tech: ['Python', 'Java', 'AWS', 'Terraform', 'Kubernetes', 'OpenSearch'],
+    },
+    {
+      role: 'Senior Software Engineer',
+      company: 'Mulesoft',
+      period: 'Sep 2021 – Aug 2023 · Buenos Aires',
+      summary:
+        'Connectors Team. Built and maintained connectors for MongoDB, Cassandra, Redis, Kafka, Snowflake, LDAP on Anypoint Platform.',
+      tech: ['Java', 'MongoDB', 'Redis', 'Kafka', 'Snowflake', 'SOLID'],
+    },
+    {
+      role: 'Senior Software Engineer',
+      company: 'Mercado Pago',
+      period: 'Jul 2020 – Sep 2021 · Buenos Aires',
+      summary:
+        'Accounts Team. Core service managing user accounts and secure financial transactions in a fintech platform.',
+      tech: ['Golang', 'CQRS', 'Event Sourcing', 'Oracle', 'Hexagonal Architecture'],
     },
     {
       role: 'Software Engineer',
-      company: 'Consulting & Product Companies',
-      period: '14+ years · Argentina → Spain',
+      company: 'Almundo.com',
+      period: 'Aug 2016 – Jun 2020 · Buenos Aires',
       summary:
-        'Backend engineering across fintech, travel, and B2B SaaS. Domain-driven design and leading teams to deliver complex systems.',
-      tech: ['Java', 'Python', 'DDD', 'Microservices'],
+        'Hotels, Notifications, Architecture, and Cross Services teams. API integrations, identity management, and platform services.',
+      tech: ['Java', 'Spring Boot', 'DDD', 'MySQL', 'ElasticSearch', 'MongoDB'],
     },
   ],
   education: {
@@ -122,11 +154,23 @@ Boring, proven tech by default — sharp tools when the problem demands it.`,
       'Extract highlights',
       'Present',
     ],
-    body: `**Senior Software Engineer — eDreams ODIGEO** · Barcelona (current)
-High-traffic backend for one of Europe's largest travel platforms. Architecture, performance, resilient services.
+    body: `**Senior Software Engineer — eDreams ODIGEO** · Mar 2025 – Current
+Data Experience Team. Oracle-to-PostgreSQL migration, backend architecture, agentic AI.
 
-**Software Engineer — Consulting & Product** · 14+ yrs (Argentina → Spain)
-Backend across fintech, travel, and B2B SaaS. Java/Python, DDD, leading teams.
+**Senior Software Engineer — Inditex** · Feb 2025 – Jan 2026
+Shopping Cart Team. Core cart service for all Inditex brands; performance & CI.
+
+**Senior Software Engineer — Connectist** · Aug 2023 – Sep 2024
+Profile Validation Team. B2B contact-data accuracy for marketing campaigns.
+
+**Senior Software Engineer — Mulesoft** · Sep 2021 – Aug 2023
+Connectors Team. MongoDB, Redis, Kafka, Snowflake, LDAP connectors on Anypoint.
+
+**Senior Software Engineer — Mercado Pago** · Jul 2020 – Sep 2021
+Accounts Team. Core user-account service in a fintech platform.
+
+**Software Engineer — Almundo.com** · Aug 2016 – Jun 2020
+Hotels, Notifications, Architecture, and Cross Services teams.
 
 → see the table below for the structured view.`,
   },
