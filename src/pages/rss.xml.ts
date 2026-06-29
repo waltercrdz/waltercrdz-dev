@@ -1,15 +1,15 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import type { APIContext } from 'astro';
 import { profile } from '../data/profile';
+import { getPublishedPosts } from '../lib/posts';
 
-export async function GET(context: { site: URL }) {
-  const posts = (await getCollection('blog', ({ data }) => !data.draft))
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+export async function GET(context: APIContext) {
+  const posts = await getPublishedPosts();
 
   return rss({
     title: `${profile.name} — Blog`,
     description: profile.tagline,
-    site: context.site,
+    site: context.site!,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,

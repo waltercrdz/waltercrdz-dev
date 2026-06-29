@@ -15,8 +15,8 @@ export const profile = {
     { label: 'GitHub', url: 'https://github.com/waltercrdz', icon: 'gh' },
     { label: 'X', url: 'https://x.com/walteriodev', icon: 'x' },
   ],
-  email: '/cdn-cgi/l/email-protection#a6d1c7cad2c3d4c5d4c2dce6c1cbc7cfca88c5c9cb',
-  emailDisplay: 'hello@waltercrdz.dev',
+  email: 'mailto:info@waltercrdz.dev',
+  emailDisplay: 'info@waltercrdz.dev',
   skills: [
     { group: 'Languages', items: ['Java', 'Python', 'Go', 'TypeScript'] },
     { group: 'Backend', items: ['Spring Boot', 'Spring Data', 'FastAPI', 'REST', 'gRPC', 'JPA', 'Hibernate', 'Maven', 'UV'] },
@@ -97,7 +97,7 @@ export const profile = {
 
 export type Profile = typeof profile;
 
-export interface TopicAnswer {
+export interface HeroTopic {
   id: string;
   label: string;
   heading: string;
@@ -123,9 +123,9 @@ ${profile.socials
   .map((s) => `- **${s.label}:** [${s.url.replace(/^https?:\/\//, '')}](${s.url})`)
   .join('\n')}
 
-Or **${profile.emailDisplay}**. → socials are in the sidebar too.`;
+Or **[${profile.emailDisplay}](${profile.email})**. → socials are in the sidebar too.`;
 
-export const heroTopics: TopicAnswer[] = [
+export const heroTopics: HeroTopic[] = [
   {
     id: 'about',
     label: 'About',
