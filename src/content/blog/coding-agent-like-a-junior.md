@@ -2,6 +2,7 @@
 title: 'Why I treat my coding agent like a junior, not a magic wand'
 description: 'A pragmatic stance on AI coding agents — harness quality, senior judgement, and where the real leverage is.'
 pubDate: 2026-06-26
+draft: true
 tags: ['ai', 'agents', 'engineering']
 ---
 
