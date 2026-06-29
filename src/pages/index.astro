@@ -26,8 +26,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
           {profile.experience.map((e) => (
             <div class="exp-row" role="row">
               <span class="exp-cell exp-cell--what" role="rowheader">
-                <span class="exp__role">{e.role}</span>
                 <span class="exp__company">{e.company}</span>
+                <span class="exp__role">{e.role}</span>
               </span>
               <span class="exp-cell exp-cell--status" role="cell">
                 <span class="exp__period">{e.period}</span>
@@ -66,29 +66,12 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     </section>
   )}
 
-  <section class="section container" id="contact">
-    <div class="cols">
-      <div class="cols__main">
-        <p class="section__label">// contact</p>
-        <h2>Let's connect</h2>
-        <p class="muted">Reach out — happy to talk shop, share knowledge, or build something together. Find more on my socials.</p>
-        <div class="contact">
-          {profile.socials.map((s) => (
-            <a class="contact__link" href={s.url} target="_blank" rel="noopener noreferrer">
-              {s.label} →
-            </a>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
 
 <style>
   .section__label,
   h2,
   .exp-table,
-  .contact,
   .latest__more {
     font-family: var(--font-mono);
   }
@@ -136,8 +119,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     flex-direction: column;
     gap: 0.15rem;
   }
-  .exp__role { color: var(--oc-success); }
-  .exp__company { color: var(--oc-success); font-size: 0.82rem; opacity: 0.85; }
+  .exp__role { color: var(--oc-text-muted); font-size: 0.82rem; }
+  .exp__company { color: var(--oc-success); font-weight: 500; }
 
   .exp-cell--status {
     display: flex;
@@ -162,19 +145,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     .exp-row { grid-template-columns: 1fr; }
     .exp-cell { border-right: none; border-bottom: 1px solid var(--oc-border-subtle); }
     .exp-cell:last-child { border-bottom: none; }
-    .contact { gap: var(--space-3); }
   }
 
   .latest { display: grid; gap: var(--space-4); margin-bottom: var(--space-5); }
   .latest__more { font-size: 0.9rem; color: var(--oc-primary); }
-
-  .contact { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); }
-  .contact__link {
-    font-size: 0.95rem;
-    border: 1px solid var(--oc-border);
-    border-radius: 0;
-    padding: 0.5rem 1rem;
-    color: var(--oc-text);
-  }
-  .contact__link:hover { border-color: var(--oc-primary); color: var(--oc-primary); }
 </style>
