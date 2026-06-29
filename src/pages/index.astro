@@ -157,7 +157,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   }
 
   @media (max-width: 760px) {
-    .section { padding: var(--space-6) 0; }
+    .section { padding: var(--space-6) var(--space-5); }
     .exp-row--head { display: none; }
     .exp-row { grid-template-columns: 1fr; }
     .exp-cell { border-right: none; border-bottom: 1px solid var(--oc-border-subtle); }
