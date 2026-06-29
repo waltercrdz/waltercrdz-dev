@@ -23,11 +23,16 @@ const socialsJson = JSON.stringify(profile.socials.map(({ label, url }) => ({ la
 
 <style>
   .hero-wrap {
-    padding-top: var(--space-8);
-    padding-bottom: var(--space-8);
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-3);
   }
   .hero-head {
-    margin-bottom: var(--space-6);
+    flex: none;
+    margin-bottom: var(--space-3);
     max-width: 640px;
   }
   .hero-head__kicker {
@@ -44,5 +49,17 @@ const socialsJson = JSON.stringify(profile.socials.map(({ label, url }) => ({ la
   }
   .hero-head__title .muted {
     color: var(--oc-text-muted);
+  }
+  agent-terminal {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  @media (max-width: 760px) {
+    .hero-wrap {
+      height: auto;
+      overflow: visible;
+    }
+    .hero-head { margin-bottom: var(--space-4); }
   }
 </style>

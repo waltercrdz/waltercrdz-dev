@@ -364,28 +364,31 @@ class AgentTerminal extends HTMLElement {
 }
 
 const STYLES = `
-  :host { display: block; }
+  :host { display: flex; flex-direction: column; overflow: hidden; }
   .ide {
     display: grid;
     grid-template-columns: minmax(0, 6fr) minmax(0, 1fr);
     gap: 1rem;
     align-items: stretch;
+    flex: 1;
+    min-height: 0;
   }
   @media (max-width: 760px) {
     .ide { grid-template-columns: 1fr; }
     .sidebar { display: none; }
-    .terminal { min-height: 620px; }
-    .terminal__body { height: 55vh; font-size: 0.82rem; }
+    .terminal { min-height: 420px; }
+    .terminal__body { font-size: 0.82rem; }
     .inputbar { font-size: 0.82rem; }
   }
 
-  .workspace { min-width: 0; }
+  .workspace { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
   .terminal {
     background: var(--oc-bg-panel);
     border: 1px solid var(--oc-border);
     border-radius: 10px;
     overflow: hidden;
-    min-height: 720px;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
   }
@@ -396,6 +399,7 @@ const STYLES = `
     padding: 0.6rem 0.85rem;
     background: var(--oc-bg-element);
     border-bottom: 1px solid var(--oc-border-subtle);
+    flex: none;
   }
   .dot { width: 11px; height: 11px; border-radius: 50%; }
   .dot--red { background: var(--oc-error); }
@@ -414,8 +418,8 @@ const STYLES = `
     font-size: 0.875rem;
     line-height: 1.7;
     color: var(--oc-text);
-    flex: none;
-    height: 50vh;
+    flex: 1;
+    min-height: 0;
   }
 
   .prompt-turn {
@@ -469,6 +473,7 @@ const STYLES = `
     background: var(--oc-bg-element);
     border-top: 1px solid var(--oc-border-subtle);
     color: var(--oc-text-muted);
+    flex: none;
   }
 
   .inputbar {
@@ -480,6 +485,7 @@ const STYLES = `
     border-top: 1px solid var(--oc-border-subtle);
     font-family: var(--font-mono);
     font-size: 0.85rem;
+    flex: none;
   }
   .inputbar__prompt { color: var(--oc-primary); }
   .inputbar__field {
@@ -523,6 +529,8 @@ const STYLES = `
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    min-height: 0;
+    overflow: hidden;
   }
   .side__group { display: flex; flex-direction: column; gap: 0.1rem; }
   .side__label {
