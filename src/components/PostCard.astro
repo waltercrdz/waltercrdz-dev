@@ -1,18 +1,15 @@
 ---
+import { formatDate } from '../lib/format';
+
 interface Props {
   href: string;
   title: string;
   description: string;
   pubDate: Date;
   tags?: string[];
-  readingTime?: string;
 }
-const { href, title, description, pubDate, tags = [], readingTime } = Astro.props;
-const dateStr = pubDate.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-});
+const { href, title, description, pubDate, tags = [] } = Astro.props;
+const dateStr = formatDate(pubDate, 'short');
 ---
 
 <article class="card">
@@ -21,7 +18,6 @@ const dateStr = pubDate.toLocaleDateString('en-US', {
       <h3 class="card__title">{title}</h3>
       <div class="card__meta">
         <time datetime={pubDate.toISOString()}>{dateStr}</time>
-        {readingTime && <span class="card__rt">· {readingTime}</span>}
       </div>
     </header>
     <p class="card__desc">{description}</p>

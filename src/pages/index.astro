@@ -1,13 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AgentTerminal from '../components/hero/AgentTerminal.astro';
-import PostCard from '../components/PostCard.astro';
+import BlogList from '../components/BlogList.astro';
 import { profile } from '../data/profile';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts } from '../lib/posts';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+const posts = (await getPublishedPosts()).slice(0, 3);
 ---
 
 <BaseLayout>
@@ -50,15 +48,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
           <p class="section__label">// latest writing</p>
           <h2>From the blog</h2>
           <div class="latest">
-            {posts.map((p) => (
-              <PostCard
-                href={`/blog/${p.id}/`}
-                title={p.data.title}
-                description={p.data.description}
-                pubDate={p.data.pubDate}
-                tags={p.data.tags}
-              />
-            ))}
+            <BlogList posts={posts} />
           </div>
           <a href="/blog" class="latest__more">view all posts →</a>
         </div>
@@ -147,6 +137,6 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     .exp-cell:last-child { border-bottom: none; }
   }
 
-  .latest { display: grid; gap: var(--space-4); margin-bottom: var(--space-5); }
+  .latest { margin-bottom: var(--space-5); }
   .latest__more { font-size: 0.9rem; color: var(--oc-primary); }
 </style>

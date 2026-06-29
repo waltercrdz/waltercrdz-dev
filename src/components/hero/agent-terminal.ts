@@ -1,10 +1,5 @@
-export interface HeroTopic {
-  id: string;
-  label: string;
-  heading: string;
-  todo: string[];
-  body: string;
-}
+import type { HeroTopic } from '../../data/profile';
+import { renderMarkdown as parseMarkdown } from './markdown';
 
 type Phase = 'idle' | 'thinking' | 'streaming';
 
@@ -227,14 +222,14 @@ class AgentTerminal extends HTMLElement {
         break;
       }
       acc += full[i];
-      this.renderMarkdown(body, acc, true);
+      this.applyMarkdown(body, acc, true);
       this.scheduleScroll(transcript);
       const ratio = i / total;
       this.updateTodo(todoItems, ratio);
       await this.delay(8 + Math.random() * 18);
     }
     this.updateTodo(todoItems, 1);
-    this.renderMarkdown(body, acc, false);
+    this.applyMarkdown(body, acc, false);
     if (this.cursorEl) this.cursorEl.remove();
     this.cursorEl = null;
     this.phase = 'idle';
@@ -281,69 +276,8 @@ class AgentTerminal extends HTMLElement {
     return c;
   }
 
-  private renderMarkdown(el: HTMLElement, src: string, streaming: boolean) {
-    const html = this.md(src);
-    el.innerHTML = html + (streaming ? '<span class="cursor">▋</span>' : '');
-  }
-
-  private md(src: string): string {
-    const esc = (s: string) =>
-      s
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
-    const inline = (s: string) =>
-      esc(s)
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(
-          /\[([^\]]+)\]\(([^)]+)\)/g,
-          '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-        );
-
-    const lines = src.split('\n');
-    let out = '';
-    let inList = false;
-    let para: string[] = [];
-
-    const flushPara = () => {
-      if (para.length) {
-        out += `<p>${inline(para.join(' '))}</p>`;
-        para = [];
-      }
-    };
-    const closeList = () => {
-      if (inList) {
-        out += '</ul>';
-        inList = false;
-      }
-    };
-
-    for (const raw of lines) {
-      const line = raw.trimEnd();
-      if (line.startsWith('## ')) {
-        flushPara();
-        closeList();
-        out += `<h2>${inline(line.slice(3))}</h2>`;
-      } else if (line.startsWith('- ')) {
-        flushPara();
-        if (!inList) {
-          out += '<ul>';
-          inList = true;
-        }
-        out += `<li>${inline(line.slice(2))}</li>`;
-      } else if (line === '') {
-        flushPara();
-        closeList();
-      } else {
-        closeList();
-        para.push(line);
-      }
-    }
-    flushPara();
-    closeList();
-    return out;
+  private applyMarkdown(el: HTMLElement, src: string, streaming: boolean) {
+    el.innerHTML = parseMarkdown(src) + (streaming ? '<span class="cursor">▋</span>' : '');
   }
 
   private delay(ms: number) {
@@ -541,11 +475,6 @@ const STYLES = `
   .side__value { color: var(--oc-text); }
   .side__value--accent { color: var(--oc-accent); }
   .side__value--success { color: var(--oc-success); }
-  .side__sep {
-    height: 1px;
-    background: var(--oc-border-subtle);
-    margin: 0.15rem 0;
-  }
 
   .user-line { color: var(--oc-secondary); margin-bottom: 0.5rem; }
   .thinking { color: var(--oc-accent); }
