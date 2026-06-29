@@ -375,7 +375,7 @@ const STYLES = `
     .ide { grid-template-columns: 1fr; }
     .sidebar { display: none; }
     .terminal { min-height: 620px; }
-    .terminal__body { max-height: 68vh; font-size: 0.82rem; }
+    .terminal__body { height: 55vh; font-size: 0.82rem; }
     .inputbar { font-size: 0.82rem; }
   }
 
@@ -414,8 +414,8 @@ const STYLES = `
     font-size: 0.875rem;
     line-height: 1.7;
     color: var(--oc-text);
-    flex: 1;
-    max-height: 80vh;
+    flex: none;
+    height: 50vh;
   }
 
   .prompt-turn {
