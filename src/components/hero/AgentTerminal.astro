@@ -1,6 +1,7 @@
 ---
-import { heroTopics } from '../../data/profile';
+import { heroTopics, profile } from '../../data/profile';
 const topicsJson = JSON.stringify(heroTopics.map(({ id, label, heading, todo, body }) => ({ id, label, heading, todo, body })));
+const socialsJson = JSON.stringify(profile.socials.map(({ label, url }) => ({ label, url })));
 ---
 
 <section class="hero-wrap container">
@@ -10,7 +11,7 @@ const topicsJson = JSON.stringify(heroTopics.map(({ id, label, heading, todo, bo
       Coding &amp; Software Architecture <span class="muted">for the real world</span>
     </h1>
   </div>
-  <agent-terminal data-topics={topicsJson}></agent-terminal>
+  <agent-terminal data-topics={topicsJson} data-socials={socialsJson}></agent-terminal>
   <noscript>
     <p class="muted">The interactive terminal needs JavaScript. The rest of the site works without it.</p>
   </noscript>
@@ -22,8 +23,8 @@ const topicsJson = JSON.stringify(heroTopics.map(({ id, label, heading, todo, bo
 
 <style>
   .hero-wrap {
-    padding-top: var(--space-7);
-    padding-bottom: var(--space-7);
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
   }
   .hero-head {
     margin-bottom: var(--space-6);

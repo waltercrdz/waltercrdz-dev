@@ -12,10 +12,14 @@ const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', 
 
 class AgentTerminal extends HTMLElement {
   private topics: HeroTopic[] = [];
-  private checked = new Set<string>();
+  private queried = new Set<string>();
   private phase: Phase = 'idle';
   private cursorEl: HTMLElement | null = null;
   private abort = false;
+  private statusEl: HTMLElement | null = null;
+  private topicsCountEl: HTMLElement | null = null;
+  private buffer = '';
+  private rafScroll = 0;
 
   connectedCallback() {
     const raw = this.getAttribute('data-topics');
@@ -31,64 +35,129 @@ class AgentTerminal extends HTMLElement {
 
   private render() {
     const root = this.attachShadow({ mode: 'open' });
+    const lastKey = String.fromCharCode(65 + this.topics.length - 1);
     root.innerHTML = `
       <style>${STYLES}</style>
-      <div class="hero">
-        <section class="selector" aria-label="Topic selector">
-          <div class="selector__prompt"><span class="prompt">&gt;</span> introduce walter <span class="muted">—select a topic</span></div>
-          <ul class="selector__list" role="list">
-            ${this.topics
-              .map(
-                (t) => `
-              <li>
-                <button class="opt" data-id="${t.id}" type="button" aria-pressed="false">
-                  <span class="opt__box" aria-hidden="true">□</span>
-                  <span class="opt__label">${t.label}</span>
-                </button>
-              </li>`
-              )
-              .join('')}
-          </ul>
-          <p class="selector__hint muted">click to run · pick more to append</p>
+      <div class="ide">
+        <section class="workspace" aria-label="Query agent terminal">
+          <div class="terminal">
+            <div class="terminal__bar">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--yellow"></span>
+              <span class="dot dot--green"></span>
+              <span class="terminal__title">waltercrdz ~ opencode</span>
+            </div>
+            <div class="terminal__body" id="transcript"></div>
+            <div class="prompt-turn">
+              <div class="prompt-q"><span class="q">?</span> What would you like to know?</div>
+              <ul class="opts" role="list">
+                ${this.topics
+                  .map((t, i) => {
+                    const key = String.fromCharCode(65 + i);
+                    return `
+                  <li>
+                    <button class="opt" data-id="${t.id}" data-key="${key}" type="button" aria-label="Run query: ${t.label}">
+                      <span class="opt__key">${key})</span>
+                      <span class="opt__label">${t.label}</span>
+                      <span class="opt__mark" aria-hidden="true"></span>
+                    </button>
+                  </li>`;
+                  })
+                  .join('')}
+              </ul>
+            </div>
+            <div class="inputbar">
+              <span class="inputbar__prompt">&gt;</span>
+              <span class="inputbar__field" id="inputfield" tabindex="0" aria-label="Query input"></span>
+              <span class="agent-pill" title="query agent">Query <span class="agent-pill__caret">▾</span></span>
+            </div>
+            <p class="prompt-hint muted">› type A–${lastKey}, then Enter — or click to run a query</p>
+          </div>
         </section>
 
-        <section class="terminal" aria-label="Agent terminal" aria-live="polite">
-          <div class="terminal__bar">
-            <span class="dot dot--red"></span>
-            <span class="dot dot--yellow"></span>
-            <span class="dot dot--green"></span>
-            <span class="terminal__title">waltercrdz ~ opencode</span>
+        <aside class="sidebar" aria-label="Session info">
+          <div class="side__group">
+            <div class="side__label">session</div>
+            <div class="side__value">waltercrdz</div>
           </div>
-          <div class="terminal__body" id="transcript"></div>
-        </section>
+          <div class="side__group">
+            <div class="side__label">status</div>
+            <div class="side__value" id="status">idle</div>
+          </div>
+          <div class="side__group">
+            <div class="side__label">agent</div>
+            <div class="side__value side__value--accent">query</div>
+          </div>
+          <div class="side__group">
+            <div class="side__label">topics</div>
+            <div class="side__value" id="topics-count">0/${this.topics.length}</div>
+          </div>
+        </aside>
       </div>
     `;
 
+    this.statusEl = root.getElementById('status');
+    this.topicsCountEl = root.getElementById('topics-count');
+
     root.querySelectorAll<HTMLButtonElement>('.opt').forEach((btn) => {
-      btn.addEventListener('click', () => this.onToggle(btn));
+      btn.addEventListener('click', () => this.onPick(btn.dataset.id!));
     });
+
+    const field = root.getElementById('inputfield') as HTMLElement | null;
+    field?.addEventListener('keydown', (e) => this.onInputKey(e));
+    root.querySelector('.terminal')?.addEventListener('click', () => field?.focus());
+    field?.focus();
   }
 
-  private async onToggle(btn: HTMLButtonElement) {
-    const id = btn.dataset.id!;
-    if (this.checked.has(id)) {
-      this.checked.delete(id);
-      btn.setAttribute('aria-pressed', 'false');
-      btn.querySelector('.opt__box')!.textContent = '□';
+  private onInputKey(e: KeyboardEvent) {
+    e.preventDefault();
+    const field = e.currentTarget as HTMLElement;
+    const lastKey = String.fromCharCode(65 + this.topics.length - 1);
+    if (e.key === 'Enter') {
+      const idx = this.buffer.toUpperCase().charCodeAt(0) - 65;
+      this.buffer = '';
+      if (field) field.textContent = '';
+      if (idx >= 0 && idx < this.topics.length) this.onPick(this.topics[idx].id);
       return;
     }
-    this.checked.add(id);
-    btn.setAttribute('aria-pressed', 'true');
-    btn.querySelector('.opt__box')!.textContent = '☒';
+    if (e.key === 'Backspace') {
+      this.buffer = '';
+      if (field) field.textContent = '';
+      return;
+    }
+    if (e.key.length !== 1) return;
+    const up = e.key.toUpperCase();
+    if (up < 'A' || up > lastKey) return;
+    this.buffer = up;
+    if (field) field.textContent = up;
+  }
 
+  private async onPick(id: string) {
     const topic = this.topics.find((t) => t.id === id);
     if (!topic) return;
-
     if (this.phase !== 'idle') {
       this.abort = true;
       await this.waitForIdle();
     }
+    this.markQueried(id);
     await this.runTurn(topic);
+  }
+
+  private markQueried(id: string) {
+    this.queried.add(id);
+    const btn = this.shadowRoot!.querySelector<HTMLButtonElement>(`.opt[data-id="${id}"]`);
+    if (btn) {
+      btn.classList.add('queried');
+      const mark = btn.querySelector('.opt__mark');
+      if (mark) mark.textContent = '✓';
+    }
+    if (this.topicsCountEl) this.topicsCountEl.textContent = `${this.queried.size}/${this.topics.length}`;
+  }
+
+  private setStatus(label: string, cls: string) {
+    if (!this.statusEl) return;
+    this.statusEl.textContent = label;
+    this.statusEl.className = `side__value ${cls}`;
   }
 
   private waitForIdle(): Promise<void> {
@@ -107,11 +176,19 @@ class AgentTerminal extends HTMLElement {
     turn.className = 'turn';
     transcript.appendChild(turn);
 
+    const userLine = document.createElement('div');
+    userLine.className = 'user-line';
+    userLine.textContent = `› ${topic.label.toLowerCase()}`;
+    turn.appendChild(userLine);
+    this.scrollToBottom(transcript);
+
     const thinking = document.createElement('div');
     thinking.className = 'thinking';
     turn.appendChild(thinking);
+    this.scrollToBottom(transcript);
 
     this.phase = 'thinking';
+    this.setStatus('thinking', 'side__value--accent');
     await this.spin(thinking, 700 + Math.random() * 500);
     if (this.abort) {
       this.abort = false;
@@ -131,6 +208,7 @@ class AgentTerminal extends HTMLElement {
       todo.appendChild(row);
       return row;
     });
+    this.scrollToBottom(transcript);
 
     const body = document.createElement('div');
     body.className = 'body';
@@ -139,6 +217,7 @@ class AgentTerminal extends HTMLElement {
     body.appendChild(this.cursorEl);
 
     this.phase = 'streaming';
+    this.setStatus('streaming', 'side__value--success');
     const full = topic.body;
     let acc = '';
     const total = full.length;
@@ -149,6 +228,7 @@ class AgentTerminal extends HTMLElement {
       }
       acc += full[i];
       this.renderMarkdown(body, acc, true);
+      this.scheduleScroll(transcript);
       const ratio = i / total;
       this.updateTodo(todoItems, ratio);
       await this.delay(8 + Math.random() * 18);
@@ -158,6 +238,7 @@ class AgentTerminal extends HTMLElement {
     if (this.cursorEl) this.cursorEl.remove();
     this.cursorEl = null;
     this.phase = 'idle';
+    this.setStatus('idle', '');
     this.scrollToBottom(transcript);
   }
 
@@ -272,77 +353,39 @@ class AgentTerminal extends HTMLElement {
   private scrollToBottom(el: HTMLElement) {
     el.scrollTop = el.scrollHeight;
   }
+
+  private scheduleScroll(el: HTMLElement) {
+    if (this.rafScroll) return;
+    this.rafScroll = requestAnimationFrame(() => {
+      this.rafScroll = 0;
+      el.scrollTop = el.scrollHeight;
+    });
+  }
 }
 
 const STYLES = `
   :host { display: block; }
-  .hero {
+  .ide {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 1fr);
     gap: 1rem;
     align-items: stretch;
   }
   @media (max-width: 760px) {
-    .hero { grid-template-columns: 1fr; }
+    .ide { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .terminal { min-height: 620px; }
+    .terminal__body { max-height: 68vh; font-size: 0.82rem; }
+    .inputbar { font-size: 0.82rem; }
   }
 
-  .selector {
-    background: var(--oc-bg-panel);
-    border: 1px solid var(--oc-border-subtle);
-    border-radius: 10px;
-    padding: 1.25rem;
-    font-family: var(--font-mono);
-  }
-  .selector__prompt {
-    font-size: 0.85rem;
-    color: var(--oc-text);
-    margin-bottom: 1rem;
-    line-height: 1.5;
-  }
-  .selector__prompt .prompt { color: var(--oc-primary); }
-  .selector__list {
-    list-style: none;
-    margin: 0 0 0.75rem;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-  .opt {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    background: transparent;
-    border: 1px solid var(--oc-border-subtle);
-    border-radius: 6px;
-    padding: 0.5rem 0.65rem;
-    color: var(--oc-text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color .15s ease, color .15s ease, background .15s ease;
-  }
-  .opt:hover {
-    border-color: var(--oc-border-active);
-    color: var(--oc-text);
-  }
-  .opt[aria-pressed="true"] {
-    color: var(--oc-text);
-    border-color: var(--oc-accent);
-    background: color-mix(in srgb, var(--oc-accent) 12%, transparent);
-  }
-  .opt__box { width: 1.1em; color: var(--oc-primary); }
-  .opt[aria-pressed="true"] .opt__box { color: var(--oc-accent); }
-  .selector__hint { font-size: 0.75rem; margin: 0; }
-
+  .workspace { min-width: 0; }
   .terminal {
     background: var(--oc-bg-panel);
     border: 1px solid var(--oc-border);
     border-radius: 10px;
     overflow: hidden;
-    min-height: 340px;
+    min-height: 720px;
     display: flex;
     flex-direction: column;
   }
@@ -372,13 +415,131 @@ const STYLES = `
     line-height: 1.7;
     color: var(--oc-text);
     flex: 1;
-    max-height: 460px;
+    max-height: 80vh;
   }
-  .terminal__body:empty::before {
-    content: '› awaiting input — pick a topic';
+
+  .prompt-turn {
+    padding: 0.85rem 1.1rem;
+    border-top: 1px solid var(--oc-border-subtle);
+    flex: none;
+  }
+  .prompt-q { color: var(--oc-text); margin-bottom: 0.65rem; }
+  .prompt-q .q { color: var(--oc-secondary); margin-right: 0.35rem; }
+  .opts {
+    list-style: none;
+    margin: 0 0 0.6rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--oc-border-subtle);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    color: var(--oc-text);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .opt:hover {
+    border-color: var(--oc-secondary);
+    background: color-mix(in srgb, var(--oc-secondary) 10%, transparent);
+  }
+  .opt:focus-visible {
+    outline: 2px solid var(--oc-secondary);
+    outline-offset: 1px;
+  }
+  .opt__key { color: var(--oc-secondary); width: 1.6em; flex: none; }
+  .opt__label { flex: 1; }
+  .opt__mark { color: var(--oc-success); }
+  .opt.queried { color: var(--oc-text-muted); border-color: var(--oc-border-subtle); }
+  .opt.queried .opt__label { text-decoration: line-through; text-decoration-color: var(--oc-border-active); }
+  .prompt-hint {
+    font-size: 0.75rem;
+    margin: 0;
+    padding: 0.5rem 0.85rem 0.6rem;
+    background: var(--oc-bg-element);
+    border-top: 1px solid var(--oc-border-subtle);
     color: var(--oc-text-muted);
   }
 
+  .inputbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    background: var(--oc-bg-element);
+    border-top: 1px solid var(--oc-border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  .inputbar__prompt { color: var(--oc-primary); }
+  .inputbar__field {
+    flex: 1;
+    color: var(--oc-text-muted);
+    border-bottom: 1px solid var(--oc-border-subtle);
+    min-height: 1.2em;
+    outline: none;
+  }
+  .inputbar__field:focus {
+    border-bottom-color: var(--oc-secondary);
+    color: var(--oc-text);
+  }
+  .inputbar__field:focus::after {
+    content: '▋';
+    color: var(--oc-secondary);
+    animation: blink 1s steps(2) infinite;
+  }
+  .agent-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid var(--oc-secondary);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    color: var(--oc-secondary);
+    font-size: 0.78rem;
+    background: color-mix(in srgb, var(--oc-secondary) 12%, transparent);
+    user-select: none;
+  }
+  .agent-pill__caret { font-size: 0.7rem; }
+
+  .sidebar {
+    background: var(--oc-bg-panel);
+    border: 1px solid var(--oc-border-subtle);
+    border-radius: 10px;
+    padding: 1.1rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .side__group { display: flex; flex-direction: column; gap: 0.1rem; }
+  .side__label {
+    color: var(--oc-text-muted);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+  }
+  .side__value { color: var(--oc-text); }
+  .side__value--accent { color: var(--oc-accent); }
+  .side__value--success { color: var(--oc-success); }
+  .side__sep {
+    height: 1px;
+    background: var(--oc-border-subtle);
+    margin: 0.15rem 0;
+  }
+
+  .user-line { color: var(--oc-secondary); margin-bottom: 0.5rem; }
   .thinking { color: var(--oc-accent); }
   .thinking .spinner { display: inline-block; width: 1ch; }
   .thinking .muted { color: var(--oc-text-muted); }
@@ -411,6 +572,10 @@ const STYLES = `
     animation: blink 1s steps(2) infinite;
   }
   @keyframes blink { 50% { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor, .inputbar__field:focus::after { animation: none; }
+  }
 `;
 
 customElements.define('agent-terminal', AgentTerminal);

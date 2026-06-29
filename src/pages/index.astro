@@ -13,178 +13,166 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 <BaseLayout>
   <AgentTerminal />
 
-  <section class="section container" id="about">
-    <p class="section__label">// about</p>
-    <div class="about">
-      <div class="about__text">
-        {profile.bio.map((p) => <p>{p}</p>)}
-      </div>
-      <aside class="about__facts">
-        <div><span class="muted">location</span> {profile.location}</div>
-        <div><span class="muted">current</span> {profile.company}</div>
-        <div><span class="muted">education</span> {profile.education.school}</div>
-        <div><span class="muted">languages</span> {profile.languages.map((l) => l.name).join(' · ')}</div>
-      </aside>
-    </div>
-  </section>
-
-  <section class="section container" id="skills">
-    <p class="section__label">// skills</p>
-    <h2>The toolbox</h2>
-    <div class="skills">
-      {profile.skills.map((g) => (
-        <div class="skills__group">
-          <h3>{g.group}</h3>
-          <ul>
-            {g.items.map((it) => <li>{it}</li>)}
-          </ul>
-        </div>
-      ))}
-    </div>
-  </section>
-
   <section class="section container" id="experience">
-    <p class="section__label">// experience</p>
-    <h2>Where I've shipped</h2>
-    <div class="exp">
-      {profile.experience.map((e) => (
-        <article class="exp__item">
-          <div class="exp__role">{e.role}</div>
-          <div class="exp__company">{e.company}</div>
-          <div class="exp__period">{e.period}</div>
-          <p class="exp__summary">{e.summary}</p>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section class="section container" id="certifications">
-    <p class="section__label">// certifications</p>
-    <h2>Credentials</h2>
-    <div class="certs">
-      {profile.certifications.map((c) => (
-        <div class="certs__item">
-          <div class="certs__title">{c.title}</div>
-          <div class="certs__meta">{c.issuer} · {c.date}</div>
+    <div class="cols">
+      <div class="cols__main">
+        <p class="section__label">// experience</p>
+        <h2>Where I've shipped</h2>
+        <div class="exp-table" role="table">
+          <div class="exp-row exp-row--head" role="row">
+            <span class="exp-cell exp-cell--what" role="columnheader">What</span>
+            <span class="exp-cell exp-cell--status" role="columnheader">Status</span>
+          </div>
+          {profile.experience.map((e) => (
+            <div class="exp-row" role="row">
+              <span class="exp-cell exp-cell--what" role="rowheader">
+                <span class="exp__role">{e.role}</span>
+                <span class="exp__company">{e.company}</span>
+              </span>
+              <span class="exp-cell exp-cell--status" role="cell">
+                <span class="exp__period">{e.period}</span>
+                <span class="exp__summary">{e.summary}</span>
+                <span class="exp__tech">
+                  {e.tech.map((t) => <span class="exp__tag">{t}</span>)}
+                </span>
+              </span>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   </section>
 
   {posts.length > 0 && (
     <section class="section container" id="latest">
-      <p class="section__label">// latest writing</p>
-      <h2>From the blog</h2>
-      <div class="latest">
-        {posts.map((p) => (
-          <PostCard
-            href={`/blog/${p.id}/`}
-            title={p.data.title}
-            description={p.data.description}
-            pubDate={p.data.pubDate}
-            tags={p.data.tags}
-          />
-        ))}
+      <div class="cols">
+        <div class="cols__main">
+          <p class="section__label">// latest writing</p>
+          <h2>From the blog</h2>
+          <div class="latest">
+            {posts.map((p) => (
+              <PostCard
+                href={`/blog/${p.id}/`}
+                title={p.data.title}
+                description={p.data.description}
+                pubDate={p.data.pubDate}
+                tags={p.data.tags}
+              />
+            ))}
+          </div>
+          <a href="/blog" class="latest__more">view all posts →</a>
+        </div>
       </div>
-      <a href="/blog" class="latest__more">view all posts →</a>
     </section>
   )}
 
   <section class="section container" id="contact">
-    <p class="section__label">// contact</p>
-    <h2>Let's connect</h2>
-    <p class="muted">Reach out — happy to talk shop, share knowledge, or build something together.</p>
-    <div class="contact">
-      {profile.socials.map((s) => (
-        <a class="contact__link" href={s.url} target="_blank" rel="noopener noreferrer">
-          {s.label} →
-        </a>
-      ))}
+    <div class="cols">
+      <div class="cols__main">
+        <p class="section__label">// contact</p>
+        <h2>Let's connect</h2>
+        <p class="muted">Reach out — happy to talk shop, share knowledge, or build something together. Find more on my socials.</p>
+        <div class="contact">
+          {profile.socials.map((s) => (
+            <a class="contact__link" href={s.url} target="_blank" rel="noopener noreferrer">
+              {s.label} →
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .about {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: var(--space-6);
-    align-items: start;
-  }
-  .about__facts {
+  .section__label,
+  h2,
+  .exp-table,
+  .contact,
+  .latest__more {
     font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--oc-text);
-    border: 1px solid var(--oc-border-subtle);
-    border-radius: var(--radius);
-    padding: var(--space-4);
-    display: grid;
-    gap: var(--space-3);
-  }
-  .about__facts .muted {
-    display: inline-block;
-    width: 5.5rem;
-    color: var(--oc-text-muted);
-  }
-  @media (max-width: 720px) {
-    .about { grid-template-columns: 1fr; }
   }
 
-  .skills {
+  .cols {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--space-5);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 1fr);
+    gap: 1rem;
   }
-  .skills__group h3 { margin: 0 0 var(--space-3); }
-  .skills__group ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .cols__main { min-width: 0; }
+  @media (max-width: 760px) {
+    .cols { grid-template-columns: 1fr; }
+  }
+
+  .exp-table {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-  .skills__group li {
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
+    flex-direction: column;
     border: 1px solid var(--oc-border-subtle);
-    border-radius: var(--radius-sm);
-    padding: 0.25rem 0.6rem;
+    border-radius: 0;
+    overflow: hidden;
+    max-width: 100%;
+  }
+  .exp-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    border-bottom: 1px solid var(--oc-border-subtle);
+  }
+  .exp-row:last-child { border-bottom: none; }
+  .exp-row--head { background: var(--oc-bg-element); }
+  .exp-cell {
+    padding: 0.65rem 0.85rem;
+    border-right: 1px solid var(--oc-border-subtle);
+  }
+  .exp-cell:last-child { border-right: none; }
+
+  .exp-row--head .exp-cell {
+    color: var(--oc-accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .exp-cell--what {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .exp__role { color: var(--oc-success); }
+  .exp__company { color: var(--oc-success); font-size: 0.82rem; opacity: 0.85; }
+
+  .exp-cell--status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
     color: var(--oc-text);
   }
-
-  .exp { display: grid; gap: var(--space-5); }
-  .exp__item {
-    border-left: 2px solid var(--oc-accent);
-    padding-left: var(--space-4);
-  }
-  .exp__role { font-family: var(--font-mono); color: var(--oc-primary); font-size: 1rem; }
-  .exp__company { color: var(--oc-text); font-weight: 600; }
-  .exp__period { font-family: var(--font-mono); font-size: 0.8rem; color: var(--oc-text-muted); margin-bottom: var(--space-2); }
-  .exp__summary { margin: 0; color: var(--oc-text-muted); }
-
-  .certs {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-3);
-  }
-  .certs__item {
+  .exp__period { color: var(--oc-text-muted); font-size: 0.78rem; }
+  .exp__summary { color: var(--oc-text); font-size: 0.88rem; line-height: 1.6; }
+  .exp__tech { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.2rem; }
+  .exp__tag {
+    color: var(--oc-success);
+    font-size: 0.74rem;
     border: 1px solid var(--oc-border-subtle);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3) var(--space-4);
+    padding: 0.1rem 0.45rem;
+    border-radius: 0;
   }
-  .certs__title { font-size: 0.95rem; color: var(--oc-text); }
-  .certs__meta { font-family: var(--font-mono); font-size: 0.78rem; color: var(--oc-text-muted); margin-top: 0.25rem; }
+
+  @media (max-width: 760px) {
+    .section { padding: var(--space-6) 0; }
+    .exp-row--head { display: none; }
+    .exp-row { grid-template-columns: 1fr; }
+    .exp-cell { border-right: none; border-bottom: 1px solid var(--oc-border-subtle); }
+    .exp-cell:last-child { border-bottom: none; }
+    .contact { gap: var(--space-3); }
+  }
 
   .latest { display: grid; gap: var(--space-4); margin-bottom: var(--space-5); }
-  .latest__more { font-family: var(--font-mono); font-size: 0.9rem; color: var(--oc-primary); }
+  .latest__more { font-size: 0.9rem; color: var(--oc-primary); }
 
   .contact { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); }
   .contact__link {
-    font-family: var(--font-mono);
     font-size: 0.95rem;
     border: 1px solid var(--oc-border);
-    border-radius: var(--radius-sm);
+    border-radius: 0;
     padding: 0.5rem 1rem;
     color: var(--oc-text);
   }

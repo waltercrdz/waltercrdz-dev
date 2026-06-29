@@ -147,6 +147,11 @@ hr {
   margin: 0 auto;
   padding: 0 var(--space-4);
 }
+@media (max-width: 760px) {
+  .container {
+    padding: 0 var(--space-5);
+  }
+}
 
 .section {
   padding: var(--space-7) 0;
